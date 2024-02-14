@@ -1,6 +1,6 @@
 ---
 title: "Take Home Exam #1"
-author: "Adam J Sullivan"
+author: "Matthew Camilleri"
 date: "February 24, 2024"
 output: html_document
 ---
