@@ -98,29 +98,88 @@ The main data is in the `flights` data frame, but there are additional data sets
 
 1.  **Question 1 (10 points)** - What are the ten most common destinations for flights from NYC airports in 2013?
     Make a table that lists these in descending order of frequency and shows the number of fligts heading to each airport.
+***The top 10 most common destinations for flights headed out of NYC airports are ORD, ATL, LAX, BOS, MCO, CLT, SFO, FLL, MIA, and DCA.***
+```{r}
+library(tidyverse)
+nycflights13::flights %>%
+  count(dest) %>%
+  arrange(desc(n))
+```
 
 2.  **Question 2 (10 points)** - Which airlines have the most flights departing from NYC airports in 2013?
     Make a table that lists these in descending order of frequency and shows the number of flights for each airline.
     In your narrative mention the names of the airlines as well.
     *Hint:* You can use the `airlines` dataset to look up the airline name based on `carrier` code.
+***The airlines with the most flights out of NYC are United Air Lines (UA), JetBlue (B6), ExpressJet Airlines (EV), Delta Air Lines (DL), American Airlines (AA), Envoy Air (MQ), US Airways (US), Endeavor Air(9E), Southwest Airlines (WN), and Virgin America (VX).***
+```{r}
+library(tidyverse)
+nycflights13::flights %>%
+  count(carrier) %>%
+  arrange(desc(n))
+```
 
 3.  **Question 3 (10 points)** - Consider only flights that have non-missing arrival delay information.
     Your answer should include the name of the carrier in addition to the carrier code and the values asked.
 
     a\.
     Which carrier had the highest mean arrival delay?
+***The carrier with the highest mean arrival delay was Frontier Airlines Inc (F9). Their average delay was approximately 21.92 minutes.***
+```{r}
+library(tidyverse)
+nycflights13::flights %>%
+  filter(!is.na(arr_delay)) %>%
+  group_by(carrier) %>%
+  summarise(mean_arr_delay = mean(arr_delay)) %>%
+  arrange(desc(mean_arr_delay))
+```
 
     b\.
     Which carrier had the lowest mean arrival delay?
+***The carrier with the lowest mean arrival delay was Alaska Airlines Inc. Their average delay was approximately -9.93 minutes (meaning they were early).***
+```{r}
+library(tidyverse)
+nycflights13::flights %>%
+  filter(!is.na(arr_delay)) %>%
+  group_by(carrier) %>%
+  summarise(mean_arr_delay = mean(arr_delay)) %>%
+  arrange(mean_arr_delay)
+```
 
 4.  **Question 4 (10 points)** - What was the mean temperature at the origin airport on the day with the highest departure delay?
+
     Your answer should include the name of origin airport, the date with the highest departure delay, and the mean temperature on that day.
+***The flight left on 1/9/13 from JFK airport, and was 1301 minutes late. The mean temperature on that day was 42.6575 degrees Fahrenheit.***
+```{r}
+library(tidyverse)
+nycflights13::flights %>%
+  arrange(desc(dep_delay)) %>%
+  slice(1) %>%
+  select(origin, month, day, dep_delay)
+library(tidyverse)
+nycflights13::weather %>%
+  filter(origin == "JFK", month == 1, day == 9) %>%
+  summarise(mean_temp = mean(temp))
+```
 
 5.  **Question 5 (15 points)** - Consider breaking the day into four time intervals: 12:01am-6am, 6:01am-12pm, 12:01pm-6pm, 6:01pm-12am.
 
     a\.
     Calculate the proportion of flights that are delayed at departure at each of these time intervals.
-
+***Here is my math for the calculations: 1819+6977=8796 1819/8796≈.207 58325+67773=126098 58325/126098≈.463 32466+92213=124679 32466/124679≈.260 35822+33126=68948 35822/68948≈.520***
+***The proportion of flights that are delayed at each of the time intervals is as follows: 12:01am-6am=20.7% 6:01am-12pm=46.3% 12:01pm-6pm=26.0% 6:01pm-12am=52.0%***
+```{r}
+library(tidyverse)
+nycflights13::flights %>%
+   mutate(delay_times = case_when(
+    sched_dep_time >= 001 & sched_dep_time <= 600 ~ "12:01am-6am",
+    sched_dep_time >= 601 & sched_dep_time <= 1200 ~ "6:01am-12pm",
+    sched_dep_time >= 1201 & sched_dep_time <=1800 ~ "12:01pm-6pm",
+    sched_dep_time >= 1801 & sched_dep_time <= 2400 ~ "6:01pm-12am")) %>%
+  filter(!is.na(dep_delay)) %>%
+  mutate(dep_delay = ifelse(dep_delay > 0, "delayed", "on_time")) %>%
+  count(delay_times, dep_delay) %>%
+  group_by(delay_times)
+```
     b\.
     Comment on how the likelihood of being delayed change throughout the day?
 
