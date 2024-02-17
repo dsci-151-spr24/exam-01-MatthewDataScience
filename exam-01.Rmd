@@ -165,8 +165,7 @@ nycflights13::weather %>%
 
     a\.
     Calculate the proportion of flights that are delayed at departure at each of these time intervals.
-***Here is my math for the calculations: 1819+6977=8796 1819/8796≈.207 58325+67773=126098 58325/126098≈.463 32466+92213=124679 32466/124679≈.260 35822+33126=68948 35822/68948≈.520***
-***The proportion of flights that are delayed at each of the time intervals is as follows: 12:01am-6am=20.7% 6:01am-12pm=46.3% 12:01pm-6pm=26.0% 6:01pm-12am=52.0%***
+***Here is my math for the calculations: 1819+6977=8796 1819/8796≈.207 58325+67773=126098 58325/126098≈.463 32466+92213=124679 32466/124679≈.260 35822+33126=68948 35822/68948≈.520The proportion of flights that are delayed at each of the time intervals is as follows: 12:01am-6am=20.7% 6:01am-12pm=46.3% 12:01pm-6pm=26.0% 6:01pm-12am=52.0%***
 ```{r}
 library(tidyverse)
 nycflights13::flights %>%
@@ -182,18 +181,25 @@ nycflights13::flights %>%
 ```
     b\.
     Comment on how the likelihood of being delayed change throughout the day?
+***The likelihood of being delayed is the greatest for flights at the end of the day, but surprisingly, from 12:01pm to 6pm has much less likelihood of being delayed than the 6 hours before that. The lowest flight delay times occur in the early morning, before 6am.***
 
 6.  **Question 6 (15 points)** - Find the flight with the longest air time.
-
+```{r}
+library(tidyverse)
+nycflights13::flights %>%
+  arrange(desc(air_time)) %>%
+  inner_join(nycflights13::planes, by = "tailnum") %>%
+  select(air_time, dest, tailnum, seats)
+```
     a\.
     How long is this flight?
-
+***The flight was 695 minutes***
     b\.
     What city did it fly to?
-
+***It flew to Honolulu, Hawaii. (Googled where HNL airport was.)***
     c\.
     How many seats does the plane that flew this flight have?
-
+***There were 292 seats on that plane.***
 7.  **Question 7 (15 pts)** - The `airports` data frame contains information on a large number of primarily American airports.
     These data include location information for these airports in the form of latitude and longitude coordinates.
     In this question we limit our focus to the [Contiguous United States](https://en.wikipedia.org/wiki/Contiguous_United_States).
@@ -201,8 +207,8 @@ nycflights13::flights %>%
     What does this tell you about the geographical distribution of these airports?
     *Hint:* You will first need to limit your analysis to the Contiguous United States.
     [This Wikipedia article](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States) can help, but you're welcomed to use other resources as well.
-    Make sure to cite whatever resource you use.
 
+    Make sure to cite whatever resource you use.
 8.  **Question 8 (15 pts)** - Recreate the plot included below using the `flights` data.
     Once you have created the visualization, in no more than one paragraph, describe what you think the point of this visualization might be.
     *Hint:* The visualization uses the variable `arrival`, which is not included in the `flights` data frame.
