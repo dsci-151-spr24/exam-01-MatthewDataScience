@@ -45,7 +45,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Academic Integrity Statement
 
-*I, \_\_\_\_\_\_\_\_\_\_\_\_, hereby state that I have not communicated with or gained information in any way from my classmates or anyone other than the Professor or TA during this exam, and that all work is my own.*
+*I, Matthew Camilleri, hereby state that I have not communicated with or gained information in any way from my classmates or anyone other than the Professor or TA during this exam, and that all work is my own.*
 
 **A note on sharing / reusing code:** I am well aware that a huge volume of code is available on the web to solve any number of problems.
 For this exam you are allowed to make use of any online resources (e.g. StackOverflow) but you must explicitly cite where you obtained any code you directly use (or use as inspiration).
@@ -200,6 +200,7 @@ nycflights13::flights %>%
     c\.
     How many seats does the plane that flew this flight have?
 ***There were 292 seats on that plane.***
+
 7.  **Question 7 (15 pts)** - The `airports` data frame contains information on a large number of primarily American airports.
     These data include location information for these airports in the form of latitude and longitude coordinates.
     In this question we limit our focus to the [Contiguous United States](https://en.wikipedia.org/wiki/Contiguous_United_States).
@@ -207,12 +208,41 @@ nycflights13::flights %>%
     What does this tell you about the geographical distribution of these airports?
     *Hint:* You will first need to limit your analysis to the Contiguous United States.
     [This Wikipedia article](https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States) can help, but you're welcomed to use other resources as well.
+    
+***The northernmost place in the continental US is Northwest Angle Inlet in Lake of the Woods, Minnesota at 49°23′04.1″N 95°9′12.2″W. The southernmost place in the continental US is Western Dry Rocks, Florida Keys, Florida at 24°26.8′N 81°55.6′W. The easternmost place in the continental US is Sail Rock, Lubec, Maine at 44°48′45.2″N 66°56′49.3″W. The westernmost place in the continental US is Umatilla Reef, offshore from Cape Alava, Washington at 48°11.1′N 124°47.1′W. North = 49.384472, South = 24.446667, East = -66.947028, West = -124.785.***
+
+***Sources: Degrees Minutes Seconds to Decimal Converter https://www.rapidtables.com/convert/number/degrees-minutes-seconds-to-degrees.html Continental US Location Information https://en.wikipedia.org/wiki/List_of_extreme_points_of_the_United_States***
+
+***There are more airports in the continental US on the eastern side of the US than the western side. There are peaks around -122 longitude, which are airports toward the West Coast, and -82 longitude which are airports near the East Coast of the US. The peak at around -82 is the highest one at over 100 airports in the area close by it.***
+```{r}
+library(tidyverse)
+nycflights13::airports %>%
+  filter(
+    lat > 24.446667 & lat < 49.384472,
+    lon > -124.785 & lon < -66.947028
+  ) %>%
+  ggplot(aes(x = lon)) +
+  geom_histogram(binwidth = 2)
+```
 
     Make sure to cite whatever resource you use.
 8.  **Question 8 (15 pts)** - Recreate the plot included below using the `flights` data.
     Once you have created the visualization, in no more than one paragraph, describe what you think the point of this visualization might be.
     *Hint:* The visualization uses the variable `arrival`, which is not included in the `flights` data frame.
     You will have to create `arrival` yourself, it is a categorical variable that is equal to `"ontime"` when `arr_delay <= 0` and `"delayed"` when `arr_delay > 0`.
+
+***The visualization shows that there are similar delays at the three NYC airports, for those that have flights to PHL and RDU. There are a few outliers but the majority of the data produced close to identical results for each of the three airports. There are more delayed flights at all the airports in NYC that have flights to PHL or RDU than there are on time flights. The median delay for flights to RDU was around 25 minutes for all three airports, and the median delay for PHL flights was around 20 minutes for the two airports with data to interpret.***
+
+```{r}
+library(tidyverse)
+nycflights13::flights %>%
+  filter(month == 12, dest %in% c("PHL", "RDU")) %>%
+  mutate(arrival = ifelse(arr_delay > 0, "delayed", "ontime")) %>%
+  filter(!is.na(arrival)) %>%
+  ggplot(aes(x = arrival, y = dep_delay, color = dest)) +
+  geom_boxplot() +
+  facet_grid(dest ~ origin)
+```
 
 ![](img/plot-to-recreate.png)
 
